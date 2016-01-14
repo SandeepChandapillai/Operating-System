@@ -2,6 +2,61 @@
 ; FUNCTIONS 
 ;
 
+; assumes the value is stored in dx
+print_hex:
+	mov si, HEX_TEMPLA
+
+	mov bx,dx
+	shr bx,12 ; bx -> 0x0001
+	and bx,0x000f ; bx masked -> 0x0002
+;	add bx,48 ; converting to ASCII
+	mov bx,[HEX_CONV + bx]
+	mov [HEX_TEMPLA + 2] , bl
+
+	mov bx,dx
+	shr bx,8 ; bx -> 0x0001
+	and bx,0x000f ; bx masked -> 0x0002
+	mov bx,[HEX_CONV + bx]
+	mov [HEX_TEMPLA + 3] , bl
+
+	mov bx,dx
+	shr bx,4 ; bx -> 0x0001
+	and bx,0x000f ; bx masked -> 0x0002
+	mov bx,[HEX_CONV + bx]
+	mov [HEX_TEMPLA + 4] , bl
+
+	mov bx,dx
+	shr bx,0 ; bx -> 0x0001
+	and bx,0x000f ; bx masked -> 0x0002
+	mov bx,[HEX_CONV + bx]
+	mov [HEX_TEMPLA + 5] , bl
+
+	call print_string
+
+	ret
+
+
+; print 100 hex values from smaller address to larger 
+; or put the value in ax and we will print from there
+
+print_hex_100:
+	mov cx , 0
+	mov di , dx
+	_loop_2:
+		cmp cx , 100
+		jg _end_2
+		inc cx 
+		mov dx , [di]
+		call print_hex
+		add di ,2
+		jmp _loop_2
+
+	_end_2: 
+	
+		mov si , LONG_SPACE
+		call print_string
+		
+		ret
 
 print_string:
 
@@ -31,5 +86,16 @@ msg1:
 
 msg2: 	
 	db 'goodbye',0
+
+LONG_SPACE:
+	db '     /      ',0
+HEX_TEMPLA:
+	db '0x???? ',0
+
+HEX_CONV: 
+	db '0123456789abcdef'
+
+
+
 
 
