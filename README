@@ -1,0 +1,8 @@
+
+# CONVERT ASM TO BIN 
+nasm /../file.asm -f bin -o /../file.bin
+
+# GHEX 
+
+# RUN FILE USING qemu
+qemu-system-x86_64 /../file.bin
