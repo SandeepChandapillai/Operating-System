@@ -4,8 +4,11 @@
 
 ; assumes the value is stored in dx
 print_hex:
-	mov si, HEX_TEMPLA
+	push bx 
+	push dx 
+	push si 
 
+	mov si, HEX_TEMPLA
 	mov bx,dx
 	shr bx,12 ; bx -> 0x0001
 	and bx,0x000f ; bx masked -> 0x0002
@@ -32,7 +35,10 @@ print_hex:
 	mov [HEX_TEMPLA + 5] , bl
 
 	call print_string
-
+	
+	pop si 
+	pop dx 
+	pop bx 
 	ret
 
 
@@ -40,6 +46,10 @@ print_hex:
 ; or put the value in ax and we will print from there
 
 print_hex_100:
+	push cx
+	push di 
+	push dx
+	push si 	
 	mov cx , 0
 	mov di , dx
 	_loop_2:
@@ -55,11 +65,16 @@ print_hex_100:
 	
 		mov si , LONG_SPACE
 		call print_string
-		
+	
+		pop si
+		pop dx 
+		pop di 
+		pop cx 	
 		ret
 
 print_string:
-
+	push ax
+	push si  
 	_loop :
 		mov al, [si]
 		cmp al,0
@@ -69,9 +84,13 @@ print_string:
 		jmp _loop
 
 	_break : 
+		pop si 
+		pop ax 
 		ret 
+		
 
 print_char:
+	
 	mov ah , 0x0e
 	int 0x10			
 ;	pop dx 
