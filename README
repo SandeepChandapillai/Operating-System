@@ -6,3 +6,12 @@ nasm /../file.asm -f bin -o /../file.bin
 
 # RUN FILE USING qemu
 qemu-system-x86_64 /../file.bin
+
+
+
+# RUNNING ON VIRTUAL BOX.... 
+	
+	truncate file.bin -s 1200k
+		or truncate file.bin -s 2880
+
+	mkisofs -o file.iso -b file.bin ../FOLDER
