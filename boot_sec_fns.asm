@@ -3,6 +3,45 @@
 ;
 
 
+
+
+
+
+DISK_ERROR:
+	db 'ERROR READING SECTOR' , 0 
+
+read_from_disk:
+
+	mov ah, 0x02 ; READ SECTOR FROM DRIVE
+	mov al, 1 ; # sectors to read ; 1 sector is 512 
+	mov ch, 0 ; # select first cylinder / track 
+	mov dh, 0 ;	# select first head
+	mov cl, 2 ; select 2 nd sector  after the 512 for bootsector
+	
+	mov bx, 0 
+	mov es, bx
+	mov bx, 0x7c00 + 512  ; this specifies the sector that will be read. 
+
+
+
+	int 0x13 ; SPECIAL TYPE OF INTERUPT
+
+	jc read_error
+		
+	ret
+
+read_error:
+	mov si , DISK_ERROR
+	call print_string
+	
+	ret ; jmp $
+
+
+
+
+
+
+
 find_bios_string: ; on return dx will has the address and es will have the segment
 	push bx 
 	mov bx, 0 

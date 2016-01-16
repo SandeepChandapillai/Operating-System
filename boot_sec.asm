@@ -3,77 +3,44 @@
 mov bp , 0xffff
 mov sp , bp 
 
-
-mov si , loading
+mov si , MSG_REAL 
 call print_string
 
-call read_from_disk
+; SWTICH INTO OM 
 
-
-mov si , MY_MESS
-call print_string
-
+call switch_to_pm
 
 jmp $
 
 
-DISK_ERROR:
-	db 'ERROR READING SECTOR' , 0 
-
-read_from_disk:
-
-	mov ah, 0x02 ; READ SECTOR FROM DRIVE
-	mov al, 1 ; # sectors to read ; 1 sector is 512 
-	mov ch, 0 ; # select first cylinder / track 
-	mov dh, 0 ;	# select first head
-	mov cl, 2 ; select 2 nd sector  after the 512 for bootsector
-	
-	mov bx, 0 
-	mov es, bx
-	mov bx, 0x7c00 + 512  ; this specifies the sector that will be read. 
-
-
-
-	int 0x13 ; SPECIAL TYPE OF INTERUPT
-
-	jc read_error
-		
-	ret
-
-read_error:
-	mov si , DISK_ERROR
-	call print_string
-	
-	jmp $
-
-
-
-MSG_REAL: 	
-	db " READ MODE " , 0
-MSG_PROC:
-	db " PROTECTED MODE " , 0 
-
-
-
 ; LOAD MORE SECTORS FROM DISK 
 %include "boot_sec_fns.asm"
+
+%include "pm.asm"
+
+%include "boot_sec_pm_fns.asm"
+
+[bits 32]
+
+BEGIN_PM:
+
+	mov edx, 0xb8000
+	mov [edx], byte 'A'
+	mov [edx + 2], byte 'B'
+	
+	mov esi, MSG_PROC
+	call print_string_pm	
+
+	
+	jmp $ 
+
+
+
+[bits 16]
+
+MSG_REAL	db " REAL MODE " , 0
+MSG_PROC 	db " 32 - BIT PROTECTED MODE " , 0 
+
+
 times 510-($-$$) db 0 
 dw 0xaa55
-
-
-
-
-MY_MESS:
-	db 'LOADED INTO MEMORY BY BIOS',0 ; loaded in the next sector after the bootloader
-		; bios does only loads the 512 byte sector as 0x7c00 
-		; boot loader has to load the next if we want to use it , by boot strapping the 
-		; the BIOS 
-
-times 512 db 0
-
-
-
-
-
-
-
