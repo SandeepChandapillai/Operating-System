@@ -8,10 +8,19 @@ call print_string
 
 ; SWTICH INTO OM 
 
+
+mov si , MGS_LD_KERNEL
+call print_string
+
+mov al , 9
+mov bx, kernel_entry ; load it to sector after boot loader code. 
+call read_from_disk
+
+
+
 call switch_to_pm
 
-jmp $
-
+hlt
 
 ; LOAD MORE SECTORS FROM DISK 
 %include "boot_sec_fns.asm"
@@ -31,16 +40,20 @@ BEGIN_PM:
 	mov esi, MSG_PROC
 	call print_string_pm	
 
-	
-	jmp $ 
 
+	jmp kernel_entry	
+;	hlt
 
 
 [bits 16]
 
 MSG_REAL	db " REAL MODE " , 0
 MSG_PROC 	db " 32 - BIT PROTECTED MODE " , 0 
-
+MGS_LD_KERNEL 	db " LOADING KERNEL TO MEM FROM DISK AT 0x7e00 "
 
 times 510-($-$$) db 0 
 dw 0xaa55
+
+
+kernel_entry:
+	; KERNEL CODE WILL BE LOADED HERE

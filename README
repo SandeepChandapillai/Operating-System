@@ -15,3 +15,13 @@ qemu-system-x86_64 /../file.bin
 		or truncate file.bin -s 2880
 
 	mkisofs -o file.iso -b file.bin ../FOLDER
+
+
+gcc -ffreestanding -c kernal_1.c -o kernal_1.o -m32
+
+
+objdump -M intel -d kernal_1.o
+
+
+ld -o kernal_1.bin -Ttext 0x7e00 kernal_1.o -m elf_i386 --oformat binary
+
